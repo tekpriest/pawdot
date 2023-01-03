@@ -12,4 +12,5 @@ func Route(r fiber.Router) {
 	c := InitController(s)
 
 	r.Post("/register", c.Register)
+	r.Post("/login", c.Login)
 }

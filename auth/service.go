@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -18,12 +17,14 @@ import (
 var ctx = context.Background()
 
 type Service interface {
-	CreateUser(data IRegister, ip string) (*UserAuthData, error)
+	CreateUser(data IRegister, ip string) (*models.User, error)
 	FindByUsername(username string) (*models.User, error)
 	FindByEmail(email string) (*models.User, error)
 	FindOne(id string) (*models.User, error)
 	UpdateUser(data interface{}) (*models.User, error)
 	CreateToken(data ICreateToken) (string, error)
+	CreateAuthData(user models.User) (UserAuthData, error)
+	VerifyLogin(username string, password string) (string, bool)
 }
 
 type service struct {
@@ -31,8 +32,26 @@ type service struct {
 	rdb *redis.Client
 }
 
+// CreateAuthData implements Service
+func (s *service) CreateAuthData(user models.User) (UserAuthData, error) {
+	var userData UserAuthData
+
+	userData.User = &user
+
+	token, err := s.CreateToken(ICreateToken{
+		UserID:      user.ID,
+		AccountType: user.AccountType,
+	})
+	if err != nil {
+		return userData, err
+	}
+	userData.Token = token
+
+	return userData, nil
+}
+
 // CreateUser implements Service
-func (s *service) CreateUser(data IRegister, ip string) (*UserAuthData, error) {
+func (s *service) CreateUser(data IRegister, ip string) (*models.User, error) {
 	newUser := &models.User{
 		Username:    data.Username,
 		Email:       strings.ToLower(data.Email),
@@ -47,19 +66,7 @@ func (s *service) CreateUser(data IRegister, ip string) (*UserAuthData, error) {
 		return nil, err
 	}
 
-	token, err := s.CreateToken(ICreateToken{
-		UserID:      newUser.ID,
-		AccountType: newUser.AccountType,
-		IP:          ip,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &UserAuthData{
-		Token: token,
-		User:  user,
-	}, nil
+	return user, nil
 }
 
 // FindByEmail implements Service

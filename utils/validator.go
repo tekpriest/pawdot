@@ -13,6 +13,7 @@ type Validator struct{}
 func (Validator) ValidateBody(data interface{}) []string {
 	var errors []string
 	if err := validate.Struct(data); err != nil {
+		fmt.Println(err)
 		for _, err := range err.(validator.ValidationErrors) {
 			msg := fmt.Sprintf("%s is a %s field", err.Field(), err.Tag())
 			errors = append(errors, msg)
