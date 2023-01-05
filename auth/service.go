@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"errors"
 	"os"
 	"strings"
 	"time"
@@ -9,102 +10,61 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-redis/redis/v9"
 	"golang.org/x/crypto/bcrypt"
-	"gorm.io/gorm"
-	"pawdot.app/models"
-	"pawdot.app/utils"
+	"pawdot.app/user"
 )
 
 var ctx = context.Background()
 
 type Service interface {
-	CreateUser(data IRegister, ip string) (*models.User, error)
-	FindByUsername(username string) (*models.User, error)
-	FindByEmail(email string) (*models.User, error)
-	FindOne(id string) (*models.User, error)
-	UpdateUser(data interface{}) (*models.User, error)
-	CreateToken(data ICreateToken) (string, error)
-	CreateAuthData(user models.User) (UserAuthData, error)
-	VerifyLogin(username string, password string) (string, bool)
+	CreateUser(data IRegister) (*UserAuthData, error)
+	CheckIfUserExists(email, username string) []string
+	createToken(data ICreateToken) (string, error)
+	VerifyLogin(data IVerifyLogin) (*UserAuthData, error)
 }
 
 type service struct {
-	db  *gorm.DB
+	us  user.Service
 	rdb *redis.Client
 }
 
-// CreateAuthData implements Service
-func (s *service) CreateAuthData(user models.User) (UserAuthData, error) {
-	var userData UserAuthData
-
-	userData.User = &user
-
-	token, err := s.CreateToken(ICreateToken{
-		UserID:      user.ID,
-		AccountType: user.AccountType,
-	})
-	if err != nil {
-		return userData, err
-	}
-	userData.Token = token
-
-	return userData, nil
-}
-
 // CreateUser implements Service
-func (s *service) CreateUser(data IRegister, ip string) (*models.User, error) {
-	newUser := &models.User{
+func (s *service) CreateUser(data IRegister) (*UserAuthData, error) {
+	user, err := s.us.CreateUser(user.ICreateUser{
 		Username:    data.Username,
 		Email:       strings.ToLower(data.Email),
 		Password:    hashPassword(data.Password),
 		AccountType: data.AccountType,
-	}
-	if err := s.db.Create(newUser).Error; err != nil {
+	})
+	if err != nil {
 		return nil, err
 	}
-	user, err := s.FindOne(newUser.ID)
+	token, err := s.createToken(ICreateToken{
+		UserID:      user.ID,
+		AccountType: user.AccountType,
+	})
 	if err != nil {
 		return nil, err
 	}
 
-	return user, nil
+	return &UserAuthData{
+		Token: token,
+		User:  user,
+	}, nil
 }
 
-// FindByEmail implements Service
-func (s *service) FindByEmail(email string) (*models.User, error) {
-	var user models.User
-
-	if err := s.db.First(&user, "email = ?", strings.ToLower(email)).Error; err != nil {
-		return nil, err
+// CheckIfUserExists implements Service
+func (s *service) CheckIfUserExists(email, username string) []string {
+	errors := make([]string, 0, 2)
+	user, _ := s.us.FindByEmail(email)
+	if user != nil {
+		errors = append(errors, "user with same email already exists")
+	}
+	user, _ = s.us.FindByUsername(username)
+	if user != nil {
+		errors = append(errors, "user with same username already exists")
 	}
 
-	return &user, nil
-}
-
-// FindByUsername implements Service
-func (s *service) FindByUsername(username string) (*models.User, error) {
-	var user models.User
-
-	if err := s.db.First(&user, "username = ?", username).Error; err != nil {
-		return nil, err
-	}
-
-	return s.FindOne(user.ID)
-}
-
-// FindOne implements Service
-func (s *service) FindOne(id string) (*models.User, error) {
-	var user models.User
-
-	if err := s.db.First(&user, "id = ?", id).Error; err != nil {
-		return nil, err
-	}
-
-	return &user, nil
-}
-
-// UpdateUser implements Service
-func (*service) UpdateUser(data interface{}) (*models.User, error) {
-	panic("unimplemented")
+	return errors
 }
 
 func hashPassword(password string) string {
@@ -112,7 +72,7 @@ func hashPassword(password string) string {
 	return string(bytes)
 }
 
-func (s *service) CreateToken(data ICreateToken) (string, error) {
+func (s *service) createToken(data ICreateToken) (string, error) {
 	defer ctx.Done()
 	secret := os.Getenv("JWT_SECRET")
 	tokenData := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -134,24 +94,35 @@ func (s *service) CreateToken(data ICreateToken) (string, error) {
 	return token, nil
 }
 
-func (s *service) VerifyLogin(username string, password string) (string, bool) {
-	user, err := s.FindByUsername(username)
+func (s *service) VerifyLogin(data IVerifyLogin) (*UserAuthData, error) {
+	user, err := s.us.FindByUsername(data.Username)
 	if err != nil {
-		return err.Error(), false
+		return nil, err
 	}
-	if valid := validatePassword(password, user.Password); !valid {
-		return "username and password does not match", false
+	if valid := validatePassword(data.Password, user.Password); !valid {
+		return nil, errors.New("username and password does not match")
 	}
 
-	return user.ID, true
+	token, err := s.createToken(ICreateToken{
+		UserID:      user.ID,
+		AccountType: user.AccountType,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &UserAuthData{
+		Token: token,
+		User:  user,
+	}, nil
 }
 
 func validatePassword(password, hash string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(hash), []byte(password)) == nil
 }
 
-func InitService(db utils.DatabaseConnection) Service {
+func InitService(us user.Service) Service {
 	return &service{
-		db: db.GetDB(),
+		us: us,
 	}
 }

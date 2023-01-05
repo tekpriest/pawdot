@@ -33,3 +33,8 @@ type UserAuthData struct {
 	Token string       `json:"token"`
 	User  *models.User `json:"user"`
 }
+
+type IVerifyLogin struct {
+	ILogin
+	IP string
+}

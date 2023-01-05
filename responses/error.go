@@ -30,19 +30,29 @@ func BadRequestResponse(c *fiber.Ctx, err error, data ...interface{}) error {
 	return nil
 }
 
-func InternalServerErrorResponse(c *fiber.Ctx, message string, error interface{}) error {
+func InternalServerErrorResponse(c *fiber.Ctx, err error, data ...interface{}) error {
+	var error interface{}
+
+	if len(data) > 0 {
+		error = data[0]
+	}
 	return c.Status(http.StatusInternalServerError).JSON(&ErrorResponse{
 		Success: false,
-		Message: message,
+		Message: err.Error(),
 		Error:   error,
 		Path:    c.Path(),
 	})
 }
 
-func UnauthorizedResponse(c *fiber.Ctx, message string, error interface{}) error {
+func UnauthorizedResponse(c *fiber.Ctx, err error, data ...interface{}) error {
+	var error interface{}
+
+	if len(data) > 0 {
+		error = data[0]
+	}
 	return c.Status(http.StatusInternalServerError).JSON(&ErrorResponse{
 		Success: false,
-		Message: message,
+		Message: err.Error(),
 		Error:   error,
 		Path:    c.Path(),
 	})
