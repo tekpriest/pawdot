@@ -20,8 +20,11 @@ type User struct {
 	Username    string      `json:"username"`
 	Email       string      `json:"email"`
 	Password    string      `json:"password"`
-	ProfileImg  string      `json:"profileImg"`
-	AccountType AccountType `json:"accountType" sql:"type:ENUM('BUYER','SELLER')" gorm:"column:type"`
+	Wallet      Wallet      `json:"wallet"`
+	ProfileImg  string      `json:"profileImg"  gorm:"column:profile_img"`
+	AccountType AccountType `json:"accountType" gorm:"column:type"                                    sql:"type:ENUM('BUYER','SELLER')"`
+	Bids        []Bid       `json:"bids"        gorm:"foreignKey:user_id;references:id;type:string"`
+	Sales       []Sale      `json:"sales"       gorm:"foreignKey:trader_id;references:id;type:string"`
 } // @Name User
 
 func (u *User) BeforeCreate(d *gorm.DB) (err error) {

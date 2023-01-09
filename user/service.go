@@ -1,15 +1,12 @@
 package user
 
 import (
-	"context"
 	"strings"
 
 	"gorm.io/gorm"
 	"pawdot.app/models"
 	"pawdot.app/utils"
 )
-
-var ctx = context.Background()
 
 type Service interface {
 	CreateUser(data ICreateUser) (*models.User, error)
@@ -38,12 +35,8 @@ func (s *service) CreateUser(data ICreateUser) (*models.User, error) {
 	if err := s.db.Create(newUser).Error; err != nil {
 		return nil, err
 	}
-	user, err := s.FindOne(newUser.ID)
-	if err != nil {
-		return nil, err
-	}
 
-	return user, nil
+	return s.FindOne(newUser.ID)
 }
 
 // FindByEmail implements Service
@@ -81,5 +74,10 @@ func (s *service) FindOne(id string) (*models.User, error) {
 
 // UpdateUser implements Service
 func (s *service) UpdateUser(data interface{}) (*models.User, error) {
-	panic("unimplemented")
+	var user models.User
+	if err := s.db.Table("users").Updates(data).First(&user).Error; err != nil {
+		return nil, err
+	}
+
+	return s.FindOne(user.ID)
 }

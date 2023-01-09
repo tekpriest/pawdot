@@ -3,10 +3,10 @@ package auth
 import "pawdot.app/models"
 
 type IRegister struct {
-	Username    string             `json:"username" validate:"required"`
-	Email       string             `json:"email" validate:"required,email"`
-	Password    string             `json:"password" validate:"required"`
-	AccountType models.AccountType `json:"accountType" enum:"BUYER,SELLER"`
+	Username    string             `json:"username"    validate:"required"`
+	Email       string             `json:"email"       validate:"required,email"`
+	Password    string             `json:"password"    validate:"required"`
+	AccountType models.AccountType `json:"accountType" validate:"required"       enum:"BUYER,SELLER"`
 } // @Name Register
 
 type ILogin struct {
@@ -20,7 +20,7 @@ type IRequestPasswordReset struct {
 
 type IResetPassword struct {
 	Password string `json:"password" validate:"required"`
-	Code     string `json:"code" validate:"required"`
+	Code     string `json:"code"     validate:"required"`
 } // @Name Reset Password
 
 type ICreateToken struct {

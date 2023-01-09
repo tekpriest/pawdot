@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"pawdot.app/auth"
+	"pawdot.app/marketplace"
 	"pawdot.app/user"
 )
 
@@ -40,6 +41,7 @@ func (r *router) InitServer() error {
 
 	auth.Route(api)
 	user.Route(api)
+	marketplace.Route(api)
 
 	return r.Listen(fmt.Sprintf(":%s", os.Getenv("PORT")))
 }

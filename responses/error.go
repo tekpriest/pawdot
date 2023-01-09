@@ -7,7 +7,7 @@ import (
 )
 
 type ErrorResponse struct {
-	Success bool        `json:"success" default:"false"`
+	Success bool        `json:"success"        default:"false"`
 	Message string      `json:"message"`
 	Error   interface{} `json:"data,omitempty"`
 	Path    string      `json:"path"`
@@ -51,6 +51,20 @@ func UnauthorizedResponse(c *fiber.Ctx, err error, data ...interface{}) error {
 		error = data[0]
 	}
 	return c.Status(http.StatusInternalServerError).JSON(&ErrorResponse{
+		Success: false,
+		Message: err.Error(),
+		Error:   error,
+		Path:    c.Path(),
+	})
+}
+
+func NotFoundResponse(c *fiber.Ctx, err error, data ...interface{}) error {
+	var error interface{}
+
+	if len(data) > 0 {
+		error = data[0]
+	}
+	return c.Status(http.StatusNotFound).JSON(&ErrorResponse{
 		Success: false,
 		Message: err.Error(),
 		Error:   error,

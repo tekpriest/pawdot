@@ -1,0 +1,7 @@
+{
+  "verbose": true,
+  "ext": "*.go",
+  "ignore": ["*.json", "**/docs/*"],
+  "exec": "go run ./main.go",
+  "signal": "SIGTERM"
+}

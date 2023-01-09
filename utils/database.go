@@ -45,7 +45,9 @@ func InitDatabaseConnection() DatabaseConnection {
 	// auto migrating tables
 	db.AutoMigrate(
 		&models.User{},
-		&models.Pet{},
+		&models.Wallet{},
+		&models.Sale{},
+		&models.Bid{},
 	)
 
 	defer ctx.Done()
