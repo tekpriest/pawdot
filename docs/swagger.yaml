@@ -1,0 +1,253 @@
+basePath: /api/
+consumes:
+- application/json
+definitions:
+  Login:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  LoginSuccessfulResponse:
+    properties:
+      data:
+        $ref: '#/definitions/auth.UserAuthData'
+      mesage:
+        example: account created successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  Register:
+    properties:
+      accountType:
+        $ref: '#/definitions/models.AccountType'
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - accountType
+    - email
+    - password
+    - username
+    type: object
+  RegistrationSuccessfulResponse:
+    properties:
+      data:
+        $ref: '#/definitions/auth.UserAuthData'
+      mesage:
+        example: account created successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  auth.UserAuthData:
+    properties:
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/models.User'
+    type: object
+  models.AccountType:
+    enum:
+    - BUYER
+    - SELLER
+    type: string
+    x-enum-varnames:
+    - BUYER
+    - SELLER
+  models.Bid:
+    properties:
+      amount:
+        type: number
+      createdAt:
+        example: 2022-08-21 21:08
+        readOnly: true
+        type: string
+      id:
+        readOnly: true
+        type: string
+      saleId:
+        type: string
+      updatedAt:
+        type: string
+      userId:
+        type: string
+    type: object
+  models.Sale:
+    properties:
+      bidCount:
+        type: integer
+      bids:
+        items:
+          $ref: '#/definitions/models.Bid'
+        type: array
+      breed:
+        type: string
+      category:
+        type: string
+      createdAt:
+        example: 2022-08-21 21:08
+        readOnly: true
+        type: string
+      description:
+        type: string
+      expiresBy:
+        type: string
+      id:
+        readOnly: true
+        type: string
+      priority:
+        $ref: '#/definitions/models.SalePriority'
+      sold:
+        type: boolean
+      soldTo:
+        type: string
+      startingBig:
+        type: number
+      status:
+        $ref: '#/definitions/models.SaleStatus'
+      title:
+        type: string
+      traderId:
+        type: string
+      type:
+        $ref: '#/definitions/models.SaleType'
+      updatedAt:
+        type: string
+    type: object
+  models.SalePriority:
+    enum:
+    - 0
+    - 1
+    - 2
+    type: integer
+    x-enum-varnames:
+    - LOW
+    - NORMAL
+    - HIGH
+  models.SaleStatus:
+    enum:
+    - PENDING
+    - PUBLISHED
+    - CANCELLED
+    - CLOSED
+    type: string
+    x-enum-varnames:
+    - PENDING
+    - PUBLISHED
+    - CANCELLED
+    - CLOSED
+  models.SaleType:
+    enum:
+    - NEW
+    - PROMOTED
+    - REPUBLISHED
+    type: string
+    x-enum-varnames:
+    - NEW
+    - PROMOTED
+    - REPUBLISHED
+  models.User:
+    properties:
+      accountType:
+        $ref: '#/definitions/models.AccountType'
+      bids:
+        items:
+          $ref: '#/definitions/models.Bid'
+        type: array
+      createdAt:
+        example: 2022-08-21 21:08
+        readOnly: true
+        type: string
+      email:
+        type: string
+      id:
+        readOnly: true
+        type: string
+      password:
+        type: string
+      profileImg:
+        type: string
+      sales:
+        items:
+          $ref: '#/definitions/models.Sale'
+        type: array
+      updatedAt:
+        type: string
+      username:
+        type: string
+      wallet:
+        $ref: '#/definitions/models.Wallet'
+    type: object
+  models.Wallet:
+    properties:
+      balance:
+        type: number
+      createdAt:
+        example: 2022-08-21 21:08
+        readOnly: true
+        type: string
+      id:
+        readOnly: true
+        type: string
+      updatedAt:
+        type: string
+      userID:
+        type: string
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: Pawdow API Service
+  license:
+    name: MIT
+  title: Pawdot API Service
+  version: "1.0"
+paths:
+  /api/auth/login:
+    post:
+      operationId: login
+      parameters:
+      - description: Body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/Login'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/LoginSuccessfulResponse'
+      tags:
+      - Auth
+  /api/auth/register:
+    post:
+      operationId: register
+      parameters:
+      - description: Body
+        in: body
+        name: Register
+        required: true
+        schema:
+          $ref: '#/definitions/Register'
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/RegistrationSuccessfulResponse'
+      tags:
+      - Auth
+produces:
+- application/json
+swagger: "2.0"

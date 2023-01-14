@@ -11,7 +11,7 @@ type ErrorResponse struct {
 	Message string      `json:"message"`
 	Error   interface{} `json:"data,omitempty"`
 	Path    string      `json:"path"`
-} // @Name ErrorResponse
+} //	@Name	ErrorResponse
 
 func BadRequestResponse(c *fiber.Ctx, err error, data ...interface{}) error {
 	var error interface{}

@@ -45,8 +45,8 @@ func InitDatabaseConnection() DatabaseConnection {
 	// auto migrating tables
 	db.AutoMigrate(
 		&models.User{},
-		&models.Wallet{},
 		&models.Sale{},
+		&models.Wallet{},
 		&models.Bid{},
 	)
 

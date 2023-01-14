@@ -2,6 +2,6 @@
   "verbose": true,
   "ext": "*.go",
   "ignore": ["*.json", "**/docs/*"],
-  "exec": "go run ./main.go",
+  "exec": "swag init && go run ./main.go",
   "signal": "SIGTERM"
 }

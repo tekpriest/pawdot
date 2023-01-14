@@ -9,9 +9,10 @@ import (
 
 type Bid struct {
 	Base
-	UserID string  `json:"userId,omitempty" gorm:"column:user_id"`
-	Amount float32 `json:"amount"`
-	SaleID string  `json:"saleId,omitempty" gorm:"column:sale_id"`
+	UserID    string    `json:"userId,omitempty" gorm:"column:user_id"`
+	Amount    float32   `json:"amount"`
+	SaleID    string    `json:"saleId,omitempty" gorm:"column:sale_id"`
+	UpdatedAt time.Time `json:"-"`
 }
 
 func (b *Bid) BeforeCreate(d *gorm.DB) (err error) {

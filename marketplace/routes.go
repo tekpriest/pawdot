@@ -23,4 +23,6 @@ func Route(r fiber.Router) {
 	r.Get("/sales/bids/:saleID", m.VerifyJWTToken, c.GetSaleBids)
 	r.Get("/sales/:saleID", m.VerifyJWTToken, c.GetSale)
 	r.Post("/sales/:saleID/bid", m.VerifyJWTToken, c.CreateBid)
+	r.Delete("/sales/:saleID/cancel", m.VerifyJWTToken, c.CancelSale)
+	r.Post("/sales/:saleID/republish", m.VerifyJWTToken, c.RepublishSale)
 }

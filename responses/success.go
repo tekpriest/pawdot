@@ -7,23 +7,23 @@ import (
 )
 
 type SuccessResponse struct {
-	Success bool        `json:"success" default:"true"`
+	Success bool        `json:"success"        default:"true"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
-} // @Name SuccessResponse
+} //	@Name	SuccessResponse
 
 func CreatedResponse(c *fiber.Ctx, message string, data ...interface{}) error {
 	return c.Status(http.StatusCreated).JSON(&SuccessResponse{
 		Success: true,
 		Message: message,
-		Data:    data,
+		Data:    data[0],
 	})
 }
 
-func OkResponse(c *fiber.Ctx, message string, data interface{}) error {
+func OkResponse(c *fiber.Ctx, message string, data ...interface{}) error {
 	return c.Status(http.StatusOK).JSON(&SuccessResponse{
 		Success: true,
 		Message: message,
-		Data:    data,
+		Data:    data[0],
 	})
 }

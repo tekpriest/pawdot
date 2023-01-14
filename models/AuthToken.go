@@ -5,4 +5,4 @@ type AuthToken struct {
 	Token  string `json:"token"`
 	IP     string `json:"ip"`
 	UserID string `json:"userId"`
-} // @Name AuthToken
+} //	@Name	AuthToken

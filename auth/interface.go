@@ -7,21 +7,21 @@ type IRegister struct {
 	Email       string             `json:"email"       validate:"required,email"`
 	Password    string             `json:"password"    validate:"required"`
 	AccountType models.AccountType `json:"accountType" validate:"required"       enum:"BUYER,SELLER"`
-} // @Name Register
+} //@Name Register
 
 type ILogin struct {
 	Username string `json:"username" validate:"required"`
 	Password string `json:"password" validate:"required"`
-} // @Name Login
+} //@Name Login
 
 type IRequestPasswordReset struct {
 	Email string `json:"email" validate:"required,email"`
-} // @Name Request Password Reset
+} //	@Name	Request Password Reset
 
 type IResetPassword struct {
 	Password string `json:"password" validate:"required"`
 	Code     string `json:"code"     validate:"required"`
-} // @Name Reset Password
+} //	@Name	Reset Password
 
 type ICreateToken struct {
 	UserID      string

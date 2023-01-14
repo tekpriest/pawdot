@@ -14,7 +14,7 @@ type Pagination struct {
 	TotalItems   int64 `json:"totalItems"`
 	NextPage     int   `json:"nextPage"`
 	PreviousPage int   `json:"previousPage"`
-} // @Name Pagination
+} //	@Name	Pagination
 
 func AppError(err error, msg ...string) {
 	log.Fatalf("%s %s", err, msg)

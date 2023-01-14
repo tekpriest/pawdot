@@ -21,11 +21,11 @@ type User struct {
 	Email       string      `json:"email"`
 	Password    string      `json:"password"`
 	Wallet      Wallet      `json:"wallet"`
-	ProfileImg  string      `json:"profileImg"  gorm:"column:profile_img"`
-	AccountType AccountType `json:"accountType" gorm:"column:type"                                    sql:"type:ENUM('BUYER','SELLER')"`
-	Bids        []Bid       `json:"bids"        gorm:"foreignKey:user_id;references:id;type:string"`
-	Sales       []Sale      `json:"sales"       gorm:"foreignKey:trader_id;references:id;type:string"`
-} // @Name User
+	ProfileImg  string      `json:"profileImg"      gorm:"column:profile_img"`
+	AccountType AccountType `json:"accountType"     gorm:"column:type"                                    sql:"type:ENUM('BUYER','SELLER')"`
+	Bids        []Bid       `json:"bids,omitempty"  gorm:"foreignKey:user_id;references:id;type:string"`
+	Sales       []Sale      `json:"sales,omitempty" gorm:"foreignKey:trader_id;references:id;type:string"`
+} //	@Name	User
 
 func (u *User) BeforeCreate(d *gorm.DB) (err error) {
 	u.ID = cuid.New()

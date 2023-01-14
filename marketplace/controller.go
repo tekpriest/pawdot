@@ -2,7 +2,6 @@ package marketplace
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -20,6 +19,8 @@ type Controller interface {
 	GetSale(ctx *fiber.Ctx) error
 	CreateBid(ctx *fiber.Ctx) error
 	GetSaleBids(ctx *fiber.Ctx) error
+	CancelSale(ctx *fiber.Ctx) error
+	RepublishSale(ctx *fiber.Ctx) error
 }
 
 type controller struct {
@@ -45,9 +46,11 @@ func (c *controller) CreateBid(ctx *fiber.Ctx) error {
 	)
 
 	sale, err := c.s.PlaceBid(saleID, userID, data.Amount)
-	fmt.Println(err)
 	if err != nil {
-		return responses.NotFoundResponse(ctx, errors.New("sale not found"), err)
+		if err.Error() == "record not found" {
+			return responses.NotFoundResponse(ctx, errors.New("sale not found"))
+		}
+		return responses.BadRequestResponse(ctx, err, errors.New("sale not found"))
 	}
 
 	return responses.OkResponse(ctx, "bid placed successfully", sale)
@@ -153,6 +156,35 @@ func (c *controller) GetPersonalSales(ctx *fiber.Ctx) error {
 	}
 
 	return responses.OkResponse(ctx, "fetched all personal sales", sales)
+}
+
+// CancelSale implements Controller
+func (c *controller) CancelSale(ctx *fiber.Ctx) error {
+	saleID := ctx.Params("saleID")
+	if saleID == "" {
+		return responses.BadRequestResponse(ctx, errors.New("empty parameter"))
+	}
+
+	if err := c.s.CancelSale(saleID); err != nil {
+		return responses.BadRequestResponse(ctx, err)
+	}
+
+	return responses.OkResponse(ctx, "sale cancelled successfully")
+}
+
+// RepublishSale implements Controller
+func (c *controller) RepublishSale(ctx *fiber.Ctx) error {
+	saleID := ctx.Params("saleID")
+	if saleID == "" {
+		return responses.BadRequestResponse(ctx, errors.New("empty parameter"))
+	}
+
+	sale, err := c.s.RepublishSale(saleID)
+	if err != nil {
+		return responses.BadRequestResponse(ctx, err)
+	}
+
+	return responses.OkResponse(ctx, "sale republished successfully", sale)
 }
 
 func InitController(s Service) Controller {

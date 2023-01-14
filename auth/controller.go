@@ -21,17 +21,26 @@ type controller struct {
 	v utils.Validator
 }
 
-// Register implements Controller
+// Register godoc
+// @Tags Auth
+// @ID register
+// @Router /api/auth/register [post]
+// @Param Register body IRegister true "Body"
+// @Success 201 {object} RegistrationSuccessfulResponse
 func (c *controller) Register(ctx *fiber.Ctx) error {
 	var data IRegister
 
-	responses.BadRequestResponse(ctx, ctx.BodyParser(&data))
+	if err := ctx.BodyParser(&data); err != nil {
+		responses.BadRequestResponse(ctx, err)
+	}
 
-	responses.BadRequestResponse(
-		ctx,
-		errors.New("there was an error processing this request"),
-		c.v.ValidateBody(data),
-	)
+	if err := c.v.ValidateBody(data); err != nil {
+		responses.BadRequestResponse(
+			ctx,
+			errors.New("there was an error processing this request"),
+			err,
+		)
+	}
 
 	if errs := c.s.CheckIfUserExists(data.Email, data.Username); len(errs) > 0 {
 		return responses.BadRequestResponse(ctx, errors.New("account could not be created"), errs)
@@ -39,39 +48,68 @@ func (c *controller) Register(ctx *fiber.Ctx) error {
 
 	userData, err := c.s.CreateUser(data)
 	if err != nil {
-		return responses.InternalServerErrorResponse(ctx, errors.New("there was an issue creating this user"), err)
+		return responses.InternalServerErrorResponse(
+			ctx,
+			errors.New("there was an issue creating this user"),
+			err,
+		)
 	}
 
 	if err != nil {
-		return responses.BadRequestResponse(ctx, errors.New("there was an error with this request"), err)
+		return responses.BadRequestResponse(
+			ctx,
+			errors.New("there was an error with this request"),
+			err,
+		)
 	}
 
 	return responses.CreatedResponse(ctx, "account created successfully", userData)
 }
 
-// Login implements Controller
+// Login godoc
+// @Tags Auth
+// @ID login
+// @Router /api/auth/login [post]
+// @Param body body ILogin true "Body"
+// @Success 201 {object} LoginSuccessfulResponse
 func (c *controller) Login(ctx *fiber.Ctx) (err error) {
 	var data ILogin
 
-	responses.BadRequestResponse(ctx, ctx.BodyParser(&data))
+	if err := ctx.BodyParser(&data); err != nil {
+		return responses.BadRequestResponse(ctx, err)
+	}
 
-	responses.BadRequestResponse(
-		ctx,
-		errors.New("there was an error processing this request"),
-		c.v.ValidateBody(data),
-	)
+	if err := c.v.ValidateBody(data); err != nil {
+		return responses.BadRequestResponse(
+			ctx,
+			errors.New("there was an error processing this request"),
+			err,
+		)
+	}
+	// responses.BadRequestResponse(ctx, ctx.BodyParser(&data))
+	//
+	// responses.BadRequestResponse(
+	// 	ctx,
+	// 	errors.New("there was an error processing this request"),
+	// 	c.v.ValidateBody(data),
+	// )
 
 	userData, err := c.s.VerifyLogin(IVerifyLogin{
 		ILogin: data,
 		IP:     ctx.IP(),
 	})
 	if err != nil {
-		responses.BadRequestResponse(ctx, err, errors.New("wrong credentials entered"))
-		return
+		if err.Error() == "record not found" {
+			return responses.NotFoundResponse(ctx, errors.New("account does not exist"), err)
+		}
+		return responses.BadRequestResponse(
+			ctx,
+			errors.New("wrong credentials entered"),
+			err.Error(),
+		)
 	}
 
-	responses.OkResponse(ctx, "logged in successfully", userData)
-	return
+	return responses.OkResponse(ctx, "logged in successfully", userData)
 }
 
 func InitController(s Service) Controller {
