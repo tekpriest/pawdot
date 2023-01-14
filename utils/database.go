@@ -5,7 +5,7 @@ import (
 	"os"
 
 	// "github.com/go-redis/redis/v9"
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"pawdot.app/models"
@@ -35,9 +35,12 @@ func InitDatabaseConnection() DatabaseConnection {
 	ctx := context.Background()
 	dbUrl := os.Getenv("DATABASE_URL")
 
-	db, err := gorm.Open(mysql.Open(dbUrl), &gorm.Config{
+	db, err := gorm.Open(postgres.Open(dbUrl), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),
 	})
+	// db, err := gorm.Open(mysql.Open(dbUrl), &gorm.Config{
+	// 	Logger: logger.Default.LogMode(logger.Info),
+	// })
 	if err != nil {
 		AppError(err, "there was an error connecting to database")
 	}

@@ -25,7 +25,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/auth/login": {
+        "/auth/login": {
             "post": {
                 "tags": [
                     "Auth"
@@ -52,7 +52,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/auth/register": {
+        "/auth/register": {
             "post": {
                 "tags": [
                     "Auth"

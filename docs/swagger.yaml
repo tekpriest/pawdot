@@ -214,7 +214,7 @@ info:
   title: Pawdot API Service
   version: "1.0"
 paths:
-  /api/auth/login:
+  /auth/login:
     post:
       operationId: login
       parameters:
@@ -231,7 +231,7 @@ paths:
             $ref: '#/definitions/LoginSuccessfulResponse'
       tags:
       - Auth
-  /api/auth/register:
+  /auth/register:
     post:
       operationId: register
       parameters:

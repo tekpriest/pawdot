@@ -24,7 +24,7 @@ type controller struct {
 // Register godoc
 // @Tags Auth
 // @ID register
-// @Router /api/auth/register [post]
+// @Router /auth/register [post]
 // @Param Register body IRegister true "Body"
 // @Success 201 {object} RegistrationSuccessfulResponse
 func (c *controller) Register(ctx *fiber.Ctx) error {
@@ -69,7 +69,7 @@ func (c *controller) Register(ctx *fiber.Ctx) error {
 // Login godoc
 // @Tags Auth
 // @ID login
-// @Router /api/auth/login [post]
+// @Router /auth/login [post]
 // @Param body body ILogin true "Body"
 // @Success 201 {object} LoginSuccessfulResponse
 func (c *controller) Login(ctx *fiber.Ctx) (err error) {

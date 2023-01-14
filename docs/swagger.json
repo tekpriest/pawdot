@@ -18,7 +18,7 @@
     "host": "localhost:3000",
     "basePath": "/api/",
     "paths": {
-        "/api/auth/login": {
+        "/auth/login": {
             "post": {
                 "tags": [
                     "Auth"
@@ -45,7 +45,7 @@
                 }
             }
         },
-        "/api/auth/register": {
+        "/auth/register": {
             "post": {
                 "tags": [
                     "Auth"
