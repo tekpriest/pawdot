@@ -11,7 +11,7 @@
         "title": "Pawdot API Service",
         "contact": {},
         "license": {
-            "name": "MIT"
+            "name": "ISC"
         },
         "version": "1.0"
     },
@@ -39,7 +39,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/LoginSuccessfulResponse"
+                            "$ref": "#/definitions/auth.LoginSuccessfulResponse"
                         }
                     }
                 }
@@ -66,7 +66,314 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/RegistrationSuccessfulResponse"
+                            "$ref": "#/definitions/auth.RegistrationSuccessfulResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/marketplace/personal/bids": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKey": []
+                    }
+                ],
+                "tags": [
+                    "Bid"
+                ],
+                "operationId": "getPersonalBids",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/GetPersonalBidsSuccessfulResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/marketplace/personal/sales": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKey": []
+                    }
+                ],
+                "tags": [
+                    "Sale"
+                ],
+                "operationId": "getPersonalSales",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Breed",
+                        "name": "breed",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Category",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/GetPersonalSalesSuccessfulResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/marketplace/sales": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKey": []
+                    }
+                ],
+                "tags": [
+                    "Sale"
+                ],
+                "operationId": "getAllSales",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Breed",
+                        "name": "breed",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Category",
+                        "name": "category",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/GetAllSalesSuccessfulResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/marketplace/sales/:saleID": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKey": []
+                    }
+                ],
+                "tags": [
+                    "Sale"
+                ],
+                "operationId": "getSale",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "saleID",
+                        "name": "saleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/GetSaleSuccessfulResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/marketplace/sales/:saleID/bid": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKey": []
+                    }
+                ],
+                "tags": [
+                    "Bid"
+                ],
+                "operationId": "creaateBid",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "saleID",
+                        "name": "saleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sale.CreateBidSuccessfulResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/marketplace/sales/:saleID/bids": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKey": []
+                    }
+                ],
+                "tags": [
+                    "Bid"
+                ],
+                "operationId": "getSaleBids",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "saleID",
+                        "name": "saleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/GetSaleBidsSuccessfulResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/marketplace/sales/:saleID/cancel": {
+            "delete": {
+                "security": [
+                    {
+                        "ApiKey": []
+                    }
+                ],
+                "tags": [
+                    "Sale"
+                ],
+                "operationId": "cancelSale",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "saleID",
+                        "name": "saleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/CancelSaleSuccessfulResposnse"
+                        }
+                    }
+                }
+            }
+        },
+        "/marketplace/sales/:saleID/republish": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKey": []
+                    }
+                ],
+                "tags": [
+                    "Sale"
+                ],
+                "operationId": "republishSale",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "saleID",
+                        "name": "saleID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/CancelSaleSuccessfulResposnse"
+                        }
+                    }
+                }
+            }
+        },
+        "/marketplace/sales/new": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKey": []
+                    }
+                ],
+                "tags": [
+                    "Sale"
+                ],
+                "operationId": "createSale",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/sale.CreateSaleSuccessfulResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/profile": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKey": []
+                    }
+                ],
+                "tags": [
+                    "User"
+                ],
+                "operationId": "profile",
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/user.GetProfileSuccessfulResponse"
                         }
                     }
                 }
@@ -74,6 +381,105 @@
         }
     },
     "definitions": {
+        "CancelSaleSuccessfulResposnse": {
+            "type": "object",
+            "properties": {
+                "mesage": {
+                    "type": "string",
+                    "example": "sale cancelled successfully"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "GetAllSalesSuccessfulResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/sale.GetAllSales"
+                },
+                "mesage": {
+                    "type": "string",
+                    "example": "fetched all current sales"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "GetPersonalBidsSuccessfulResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Bid"
+                    }
+                },
+                "mesage": {
+                    "type": "string",
+                    "example": "fetched all sale bids"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "GetPersonalSalesSuccessfulResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/sale.GetAllSales"
+                },
+                "mesage": {
+                    "type": "string",
+                    "example": "fetched all sale bids"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "GetSaleBidsSuccessfulResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Bid"
+                    }
+                },
+                "mesage": {
+                    "type": "string",
+                    "example": "fetched all sale bids"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "GetSaleSuccessfulResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/models.Sale"
+                },
+                "mesage": {
+                    "type": "string",
+                    "example": "fetched all current sales"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
         "Login": {
             "type": "object",
             "required": [
@@ -86,22 +492,6 @@
                 },
                 "username": {
                     "type": "string"
-                }
-            }
-        },
-        "LoginSuccessfulResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/auth.UserAuthData"
-                },
-                "mesage": {
-                    "type": "string",
-                    "example": "account created successfully"
-                },
-                "success": {
-                    "type": "boolean",
-                    "example": true
                 }
             }
         },
@@ -128,7 +518,23 @@
                 }
             }
         },
-        "RegistrationSuccessfulResponse": {
+        "auth.LoginSuccessfulResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/auth.UserAuthData"
+                },
+                "mesage": {
+                    "type": "string",
+                    "example": "account created successfully"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "auth.RegistrationSuccessfulResponse": {
             "type": "object",
             "properties": {
                 "data": {
@@ -208,7 +614,8 @@
                     "type": "string"
                 },
                 "category": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "DOG"
                 },
                 "createdAt": {
                     "type": "string",
@@ -247,7 +654,12 @@
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/models.SaleType"
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.SaleType"
+                        }
+                    ],
+                    "example": "type"
                 },
                 "updatedAt": {
                     "type": "string"
@@ -364,6 +776,111 @@
                     "type": "string"
                 }
             }
+        },
+        "sale.CreateBidSuccessfulResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/models.Sale"
+                },
+                "mesage": {
+                    "type": "string",
+                    "example": "bid placed successfully"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "sale.CreateSaleSuccessfulResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "example": {
+                        "bidCount": "0",
+                        "breed": "Cat Dog",
+                        "category": "CAT",
+                        "createdAt": "2023-01-14T02:06:31+01:00",
+                        "description": "BDG for sale",
+                        "id": "clcv8zrk90000vboy7d4tb5ms",
+                        "priority": "1",
+                        "sold": "false",
+                        "startingBig": "20000",
+                        "status": "PENDING",
+                        "title": "Bull Dog For Sale",
+                        "traderId": "clcnz7h460000s1mo30jmkewi",
+                        "type": "NEW",
+                        "updatedAt": "2023-01-14T02:06:31+01:00"
+                    }
+                },
+                "mesage": {
+                    "type": "string",
+                    "example": "sale created successfully"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "sale.GetAllSales": {
+            "type": "object",
+            "properties": {
+                "meta": {
+                    "$ref": "#/definitions/utils.Pagination"
+                },
+                "sales": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Sale"
+                    }
+                }
+            }
+        },
+        "user.GetProfileSuccessfulResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/models.User"
+                },
+                "mesage": {
+                    "type": "string",
+                    "example": "fetched user profile"
+                },
+                "success": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "utils.Pagination": {
+            "type": "object",
+            "properties": {
+                "nextPage": {
+                    "type": "integer"
+                },
+                "previousPage": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "totalItems": {
+                    "type": "integer"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKey": {
+            "type": "apiKey",
+            "name": "x-auth-token",
+            "in": "header"
         }
     }
 }

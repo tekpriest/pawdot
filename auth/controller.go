@@ -3,13 +3,10 @@ package auth
 import (
 	"errors"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"pawdot.app/responses"
 	"pawdot.app/utils"
 )
-
-var v validator.ValidationErrors
 
 type Controller interface {
 	Register(c *fiber.Ctx) error
@@ -22,20 +19,20 @@ type controller struct {
 }
 
 // Register godoc
-// @Tags Auth
-// @ID register
-// @Router /auth/register [post]
-// @Param Register body IRegister true "Body"
-// @Success 201 {object} RegistrationSuccessfulResponse
+//	@Tags		Auth
+//	@ID			register
+//	@Router		/auth/register [post]
+//	@Param		Register	body		IRegister	true	"Body"
+//	@Success	201			{object}	RegistrationSuccessfulResponse
 func (c *controller) Register(ctx *fiber.Ctx) error {
 	var data IRegister
 
 	if err := ctx.BodyParser(&data); err != nil {
-		responses.BadRequestResponse(ctx, err)
+		return responses.BadRequestResponse(ctx, err)
 	}
 
 	if err := c.v.ValidateBody(data); err != nil {
-		responses.BadRequestResponse(
+		return responses.BadRequestResponse(
 			ctx,
 			errors.New("there was an error processing this request"),
 			err,
@@ -67,11 +64,11 @@ func (c *controller) Register(ctx *fiber.Ctx) error {
 }
 
 // Login godoc
-// @Tags Auth
-// @ID login
-// @Router /auth/login [post]
-// @Param body body ILogin true "Body"
-// @Success 201 {object} LoginSuccessfulResponse
+//	@Tags		Auth
+//	@ID			login
+//	@Router		/auth/login [post]
+//	@Param		body	body		ILogin	true	"Body"
+//	@Success	201		{object}	LoginSuccessfulResponse
 func (c *controller) Login(ctx *fiber.Ctx) (err error) {
 	var data ILogin
 

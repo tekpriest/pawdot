@@ -34,8 +34,8 @@ const (
 
 type Sale struct {
 	Base
-	Type        SaleType     `json:"type"                gorm:"column:type;default:NEW"                      sql:"type:ENUM('NEW','PROMOTED','REPUBLISHED')"`
-	Category    string       `json:"category"`
+	Type        SaleType     `json:"type"                gorm:"column:type;default:NEW"                      sql:"type:ENUM('NEW','PROMOTED','REPUBLISHED')"            example:"type"`
+	Category    string       `json:"category"                                                                                                                           example:"DOG"`
 	Priority    SalePriority `json:"priority"            gorm:"column:priority"`
 	Breed       string       `json:"breed"`
 	Title       string       `json:"title"`
@@ -48,7 +48,7 @@ type Sale struct {
 	BidCount    int64        `json:"bidCount"            gorm:"bid_count;->"`
 	Bids        []Bid        `json:"bids,omitempty"      gorm:"foreignKey:sale_id;references:id;type:string"`
 	ExpiresBy   *time.Time   `json:"expiresBy,omitempty" gorm:"column:expires_by"`
-}
+} //	@Name	Sale Model
 
 func (s *Sale) BeforeCreate(d *gorm.DB) (err error) {
 	s.ID = cuid.New()

@@ -1,4 +1,4 @@
-package marketplace
+package sale
 
 import (
 	"errors"
@@ -13,17 +13,15 @@ import (
 
 type Service interface {
 	CreateSale(userID string, data ICreateSale) (*models.Sale, error)
-	PlaceBid(saleID, userId string, amount float32) (*models.Sale, error)
-	FetchBid(userID, saleID string) (*models.Bid, error)
 	FetchAllSales(query IQuerySales) (GetAllSales, error)
 	FetchSale(saleID string) (*models.Sale, error)
-	FetchPersonalSales(userID string, query IQuerySales) (GetAllSales, error)
-	SetWinner(saleID, bidderID string) (*models.Sale, error)
 	FetchSaleBids(saleID string) ([]models.Bid, error)
-	FetchPersonalBids(userID string) ([]models.Bid, error)
 	CancelSale(saleID string) error
 	RepublishSale(saleID string) (*models.Sale, error)
-	reverseBids(saleID string) (err error)
+	PlaceBid(saleID, userId string, amount float32) (*models.Sale, error)
+	FetchBid(userID, saleID string) (*models.Bid, error)
+	FetchPersonalSales(userID string, query IQuerySales) (GetAllSales, error)
+	FetchPersonalBids(userID string) ([]models.Bid, error)
 }
 
 type service struct {
@@ -236,14 +234,10 @@ func (s *service) CancelSale(saleID string) error {
 		return err
 	}
 
-	if len(sale.Bids) > 0 {
-		s.reverseBids(saleID)
-	}
-
-	if err := s.db.Table("sales").Where("id = ?", sale.ID).Update("status", models.CANCELLED).Error; err != nil {
-		return err
-	}
-	return nil
+	return s.db.
+		Table("sales").
+		Where("id = ?", sale.ID).
+		Update("status", models.CANCELLED).Error
 }
 
 // RepublishSale implements Service
@@ -255,33 +249,13 @@ func (s *service) RepublishSale(saleID string) (*models.Sale, error) {
 	if sale.Status == models.CANCELLED {
 		return nil, errors.New("you can't republished a cancelled sale")
 	}
-	if len(sale.Bids) > 0 {
-		s.reverseBids(saleID)
-	}
-	if err := s.db.Table("bids").Where("id =?", sale.ID).Update("status", models.REPUBLISHED).Error; err != nil {
+
+	if err := s.db.
+		Table("bids").
+		Where("id =?", sale.ID).
+		Update("status", models.REPUBLISHED).Error; err != nil {
 		return nil, err
 	}
 
 	return s.FetchSale(saleID)
-}
-
-// reverseBids implements Service
-func (s *service) reverseBids(saleID string) (err error) {
-	bids, err := s.FetchSaleBids(saleID)
-	if err != nil {
-		return err
-	}
-
-	for i := 0; i < len(bids); i++ {
-		bid := bids[i]
-		var wallet models.Wallet
-
-		s.db.First(&wallet, "user_id = ?", bid.UserID)
-		s.db.Table("wallets").
-			Where("user_id = ?", bid.UserID).
-			Update("balance", wallet.Balance+bid.Amount)
-		s.db.Delete(&bid, "id = ?", bid.ID)
-	}
-
-	return
 }

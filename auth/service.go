@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/go-redis/redis/v9"
 	"golang.org/x/crypto/bcrypt"
 	"pawdot.app/user"
 )
@@ -23,8 +22,7 @@ type Service interface {
 }
 
 type service struct {
-	us  user.Service
-	rdb *redis.Client
+	us user.Service
 }
 
 // CreateUser implements Service

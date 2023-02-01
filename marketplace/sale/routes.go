@@ -1,4 +1,4 @@
-package marketplace
+package sale
 
 import (
 	"github.com/gofiber/fiber/v2"

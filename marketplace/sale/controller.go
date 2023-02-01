@@ -1,15 +1,12 @@
-package marketplace
+package sale
 
 import (
 	"errors"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"pawdot.app/responses"
 	"pawdot.app/utils"
 )
-
-var v validator.ValidationErrors
 
 type Controller interface {
 	CreateSale(ctx *fiber.Ctx) error
@@ -28,7 +25,14 @@ type controller struct {
 	v utils.Validator
 }
 
-// CreateBid implements Controller
+// CreateBid godoc
+//
+//	@Tags		Bid
+//	@ID			creaateBid
+//	@Security	ApiKey
+//	@Router		/marketplace/sales/:saleID/bid [post]
+//	@Param		saleID	path		string	true	"saleID"
+//	@Success	200		{object}	CreateBidSuccessfulResponse
 func (c *controller) CreateBid(ctx *fiber.Ctx) error {
 	var data ICreateBid
 	userID := ctx.Get("userId")
@@ -37,13 +41,17 @@ func (c *controller) CreateBid(ctx *fiber.Ctx) error {
 		return responses.BadRequestResponse(ctx, errors.New("empty parameter"))
 	}
 
-	responses.BadRequestResponse(ctx, ctx.BodyParser(&data))
+	if err := ctx.BodyParser(&data); err != nil {
+		return responses.BadRequestResponse(ctx, err)
+	}
 
-	responses.BadRequestResponse(
-		ctx,
-		errors.New("there was an error processing this request"),
-		c.v.ValidateBody(data),
-	)
+	if err := c.v.ValidateBody(data); err != nil {
+		return responses.BadRequestResponse(
+			ctx,
+			errors.New("there was an error processing this request"),
+			err,
+		)
+	}
 
 	sale, err := c.s.PlaceBid(saleID, userID, data.Amount)
 	if err != nil {
@@ -56,13 +64,19 @@ func (c *controller) CreateBid(ctx *fiber.Ctx) error {
 	return responses.OkResponse(ctx, "bid placed successfully", sale)
 }
 
-// CreateSale implements Controller
+// CreateSale godoc
+//
+//	@Tags		Sale
+//	@ID			createSale
+//	@Security	ApiKey
+//	@Router		/marketplace/sales/new [post]
+//	@Success	201	{object}	CreateSaleSuccessfulResponse
 func (c *controller) CreateSale(ctx *fiber.Ctx) error {
 	userID := ctx.Get("userId")
 	var data ICreateSale
 
 	if err := ctx.BodyParser(&data); err != nil {
-		responses.BadRequestResponse(ctx, err)
+		return responses.BadRequestResponse(ctx, err)
 	}
 
 	if errs := c.v.ValidateBody(data); len(errs) > 0 {
@@ -85,11 +99,25 @@ func (c *controller) CreateSale(ctx *fiber.Ctx) error {
 	return responses.CreatedResponse(ctx, "sale created successfully", sale)
 }
 
-// GetAllSales implements Controller
+// GetAllSales godoc
+//
+//	@Tags		Sale
+//	@ID			getAllSales
+//	@Security	ApiKey
+//	@Router		/marketplace/sales [get]
+//
+// @Param breed query string false "Breed"
+// @Param category query string false "Category"
+// @Param page query int false "Page" default:"1"
+// @Param limit query int false "Limit" default:"20"
+//
+//	@Success	201	{object}	GetAllSalesSuccessfulResponse
 func (c *controller) GetAllSales(ctx *fiber.Ctx) error {
 	var query IQuerySales
 
-	responses.BadRequestResponse(ctx, ctx.QueryParser(&query))
+	if err := ctx.QueryParser(&query); err != nil {
+		return responses.BadRequestResponse(ctx, err)
+	}
 
 	if query.Limit == 0 {
 		query.Limit = 20
@@ -110,19 +138,33 @@ func (c *controller) GetAllSales(ctx *fiber.Ctx) error {
 	return responses.OkResponse(ctx, "fetched all current sales", sales)
 }
 
-// GetSale implements Controller
+// GetSale godoc
+//
+//	@Tags		Sale
+//	@ID			getSale
+//	@Security	ApiKey
+//	@Router		/marketplace/sales/:saleID [get]
+//	@Param		saleID	path		string	true	"saleID"
+//	@Success	201	{object}	GetSaleSuccessfulResponse
 func (c *controller) GetSale(ctx *fiber.Ctx) error {
 	saleID := ctx.Params("saleID")
 
 	sale, err := c.s.FetchSale(saleID)
 	if err != nil {
-		responses.NotFoundResponse(ctx, errors.New("sale not found"), err)
+		return responses.NotFoundResponse(ctx, errors.New("sale not found"), err)
 	}
 
 	return responses.OkResponse(ctx, "fetched sale", sale)
 }
 
-// GetSaleBids implements Controller
+// GetSaleBids godoc
+//
+//	@Tags		Bid
+//	@ID			getSaleBids
+//	@Security	ApiKey
+//	@Router		/marketplace/sales/:saleID/bids [get]
+//	@Param		saleID	path		string	true	"saleID"
+//	@Success	201	{object}	GetSaleBidsSuccessfulResponse
 func (c *controller) GetSaleBids(ctx *fiber.Ctx) error {
 	saleID := ctx.Params("saleID")
 	bids, err := c.s.FetchSaleBids(saleID)
@@ -132,7 +174,13 @@ func (c *controller) GetSaleBids(ctx *fiber.Ctx) error {
 	return responses.OkResponse(ctx, "fetched all sale bids", bids)
 }
 
-// GetPersonalBids implements Controller
+// GetSaleBids godoc
+//
+//	@Tags		Bid
+//	@ID			getPersonalBids
+//	@Security	ApiKey
+//	@Router		/marketplace/personal/bids [get]
+//	@Success	201	{object}	GetPersonalBidsSuccessfulResponse
 func (c *controller) GetPersonalBids(ctx *fiber.Ctx) error {
 	userID := ctx.Get("userId")
 
@@ -143,12 +191,26 @@ func (c *controller) GetPersonalBids(ctx *fiber.Ctx) error {
 	return responses.OkResponse(ctx, "fetched all personal bids", bids)
 }
 
-// GetPersonalSales implements Controller
+// GetPersonalSales godoc
+//
+//	@Tags		Sale
+//	@ID			getPersonalSales
+//	@Security	ApiKey
+//	@Router		/marketplace/personal/sales [get]
+//
+// @Param breed query string false "Breed"
+// @Param category query string false "Category"
+// @Param page query int false "Page" default:"1"
+// @Param limit query int false "Limit" default:"20"
+//
+//	@Success	201	{object}	GetPersonalSalesSuccessfulResponse
 func (c *controller) GetPersonalSales(ctx *fiber.Ctx) error {
 	userID := ctx.Get("userId")
 	var query IQuerySales
 
-	responses.BadRequestResponse(ctx, ctx.QueryParser(&query))
+	if err := ctx.QueryParser(&query); err != nil {
+		return responses.BadRequestResponse(ctx, err)
+	}
 
 	sales, err := c.s.FetchPersonalSales(userID, query)
 	if err != nil {
@@ -158,7 +220,16 @@ func (c *controller) GetPersonalSales(ctx *fiber.Ctx) error {
 	return responses.OkResponse(ctx, "fetched all personal sales", sales)
 }
 
-// CancelSale implements Controller
+// CancelSale godoc
+//
+//	@Tags		Sale
+//	@ID			cancelSale
+//	@Security	ApiKey
+//	@Router		/marketplace/sales/:saleID/cancel [delete]
+//
+//	@Param		saleID	path		string	true	"saleID"
+//
+//	@Success	201	{object}	CancelSaleSuccessfulResposnse
 func (c *controller) CancelSale(ctx *fiber.Ctx) error {
 	saleID := ctx.Params("saleID")
 	if saleID == "" {
@@ -172,7 +243,16 @@ func (c *controller) CancelSale(ctx *fiber.Ctx) error {
 	return responses.OkResponse(ctx, "sale cancelled successfully")
 }
 
-// RepublishSale implements Controller
+// RepublishSale godoc
+//
+//	@Tags		Sale
+//	@ID			republishSale
+//	@Security	ApiKey
+//	@Router		/marketplace/sales/:saleID/republish [post]
+//
+//	@Param		saleID	path		string	true	"saleID"
+//
+//	@Success	201	{object}	CancelSaleSuccessfulResposnse
 func (c *controller) RepublishSale(ctx *fiber.Ctx) error {
 	saleID := ctx.Params("saleID")
 	if saleID == "" {

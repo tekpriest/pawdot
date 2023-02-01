@@ -1,4 +1,4 @@
-package marketplace
+package sale
 
 import (
 	"pawdot.app/models"

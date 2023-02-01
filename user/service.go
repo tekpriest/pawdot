@@ -15,7 +15,6 @@ type Service interface {
 	FindByEmail(email string) (*models.User, error)
 	FindOne(id string) (*models.User, error)
 	UpdateUser(data interface{}) (*models.User, error)
-	// Wallet ops
 	DebitWallet(userID string, amount float32) error
 	CreditWallet(userID string, amount float32) error
 }
@@ -123,8 +122,4 @@ func (s *service) DebitWallet(userID string, amount float32) error {
 	}
 
 	return nil
-}
-
-func (s *service) createWallet(userID string, wallet *models.Wallet) (*models.Wallet, error) {
-	panic("implement")
 }

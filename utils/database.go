@@ -8,7 +8,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"pawdot.app/models"
+	// "pawdot.app/models"
 )
 
 type DatabaseConnection interface {
@@ -46,12 +46,12 @@ func InitDatabaseConnection() DatabaseConnection {
 	}
 
 	// auto migrating tables
-	db.AutoMigrate(
-		&models.User{},
-		&models.Sale{},
-		&models.Wallet{},
-		&models.Bid{},
-	)
+	// db.AutoMigrate(
+	// 	&models.User{},
+	// 	&models.Sale{},
+	// 	&models.Wallet{},
+	// 	&models.Bid{},
+	// )
 
 	defer ctx.Done()
 

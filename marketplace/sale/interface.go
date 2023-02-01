@@ -1,4 +1,9 @@
-package marketplace
+package sale
+
+type IPaginateQuery struct {
+	Page  int `example:"1"`
+	Limit int `example:"20"`
+}
 
 type ICreateSale struct {
 	Category    string  `json:"category"    validate:"required"`
@@ -6,11 +11,6 @@ type ICreateSale struct {
 	Title       string  `json:"title"       validate:"required"`
 	Description string  `json:"description" validate:"required"`
 	StartingBid float32 `json:"startingBid" validate:"required"`
-}
-
-type IPaginateQuery struct {
-	Page  int
-	Limit int
 }
 
 type IQuerySales struct {

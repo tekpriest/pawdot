@@ -2,6 +2,74 @@ basePath: /api/
 consumes:
 - application/json
 definitions:
+  CancelSaleSuccessfulResposnse:
+    properties:
+      mesage:
+        example: sale cancelled successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  GetAllSalesSuccessfulResponse:
+    properties:
+      data:
+        $ref: '#/definitions/sale.GetAllSales'
+      mesage:
+        example: fetched all current sales
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  GetPersonalBidsSuccessfulResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Bid'
+        type: array
+      mesage:
+        example: fetched all sale bids
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  GetPersonalSalesSuccessfulResponse:
+    properties:
+      data:
+        $ref: '#/definitions/sale.GetAllSales'
+      mesage:
+        example: fetched all sale bids
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  GetSaleBidsSuccessfulResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Bid'
+        type: array
+      mesage:
+        example: fetched all sale bids
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  GetSaleSuccessfulResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.Sale'
+      mesage:
+        example: fetched all current sales
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
   Login:
     properties:
       password:
@@ -11,17 +79,6 @@ definitions:
     required:
     - password
     - username
-    type: object
-  LoginSuccessfulResponse:
-    properties:
-      data:
-        $ref: '#/definitions/auth.UserAuthData'
-      mesage:
-        example: account created successfully
-        type: string
-      success:
-        example: true
-        type: boolean
     type: object
   Register:
     properties:
@@ -39,7 +96,18 @@ definitions:
     - password
     - username
     type: object
-  RegistrationSuccessfulResponse:
+  auth.LoginSuccessfulResponse:
+    properties:
+      data:
+        $ref: '#/definitions/auth.UserAuthData'
+      mesage:
+        example: account created successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  auth.RegistrationSuccessfulResponse:
     properties:
       data:
         $ref: '#/definitions/auth.UserAuthData'
@@ -94,6 +162,7 @@ definitions:
       breed:
         type: string
       category:
+        example: DOG
         type: string
       createdAt:
         example: 2022-08-21 21:08
@@ -121,7 +190,9 @@ definitions:
       traderId:
         type: string
       type:
-        $ref: '#/definitions/models.SaleType'
+        allOf:
+        - $ref: '#/definitions/models.SaleType'
+        example: type
       updatedAt:
         type: string
     type: object
@@ -205,12 +276,82 @@ definitions:
       userID:
         type: string
     type: object
+  sale.CreateBidSuccessfulResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.Sale'
+      mesage:
+        example: bid placed successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  sale.CreateSaleSuccessfulResponse:
+    properties:
+      data:
+        additionalProperties:
+          type: string
+        example:
+          bidCount: "0"
+          breed: Cat Dog
+          category: CAT
+          createdAt: "2023-01-14T02:06:31+01:00"
+          description: BDG for sale
+          id: clcv8zrk90000vboy7d4tb5ms
+          priority: "1"
+          sold: "false"
+          startingBig: "20000"
+          status: PENDING
+          title: Bull Dog For Sale
+          traderId: clcnz7h460000s1mo30jmkewi
+          type: NEW
+          updatedAt: "2023-01-14T02:06:31+01:00"
+        type: object
+      mesage:
+        example: sale created successfully
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  sale.GetAllSales:
+    properties:
+      meta:
+        $ref: '#/definitions/utils.Pagination'
+      sales:
+        items:
+          $ref: '#/definitions/models.Sale'
+        type: array
+    type: object
+  user.GetProfileSuccessfulResponse:
+    properties:
+      data:
+        $ref: '#/definitions/models.User'
+      mesage:
+        example: fetched user profile
+        type: string
+      success:
+        example: true
+        type: boolean
+    type: object
+  utils.Pagination:
+    properties:
+      nextPage:
+        type: integer
+      previousPage:
+        type: integer
+      size:
+        type: integer
+      totalItems:
+        type: integer
+    type: object
 host: localhost:3000
 info:
   contact: {}
   description: Pawdow API Service
   license:
-    name: MIT
+    name: ISC
   title: Pawdot API Service
   version: "1.0"
 paths:
@@ -228,7 +369,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/LoginSuccessfulResponse'
+            $ref: '#/definitions/auth.LoginSuccessfulResponse'
       tags:
       - Auth
   /auth/register:
@@ -245,9 +386,198 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/RegistrationSuccessfulResponse'
+            $ref: '#/definitions/auth.RegistrationSuccessfulResponse'
       tags:
       - Auth
+  /marketplace/personal/bids:
+    get:
+      operationId: getPersonalBids
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/GetPersonalBidsSuccessfulResponse'
+      security:
+      - ApiKey: []
+      tags:
+      - Bid
+  /marketplace/personal/sales:
+    get:
+      operationId: getPersonalSales
+      parameters:
+      - description: Breed
+        in: query
+        name: breed
+        type: string
+      - description: Category
+        in: query
+        name: category
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/GetPersonalSalesSuccessfulResponse'
+      security:
+      - ApiKey: []
+      tags:
+      - Sale
+  /marketplace/sales:
+    get:
+      operationId: getAllSales
+      parameters:
+      - description: Breed
+        in: query
+        name: breed
+        type: string
+      - description: Category
+        in: query
+        name: category
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: integer
+      - description: Limit
+        in: query
+        name: limit
+        type: integer
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/GetAllSalesSuccessfulResponse'
+      security:
+      - ApiKey: []
+      tags:
+      - Sale
+  /marketplace/sales/:saleID:
+    get:
+      operationId: getSale
+      parameters:
+      - description: saleID
+        in: path
+        name: saleID
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/GetSaleSuccessfulResponse'
+      security:
+      - ApiKey: []
+      tags:
+      - Sale
+  /marketplace/sales/:saleID/bid:
+    post:
+      operationId: creaateBid
+      parameters:
+      - description: saleID
+        in: path
+        name: saleID
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sale.CreateBidSuccessfulResponse'
+      security:
+      - ApiKey: []
+      tags:
+      - Bid
+  /marketplace/sales/:saleID/bids:
+    get:
+      operationId: getSaleBids
+      parameters:
+      - description: saleID
+        in: path
+        name: saleID
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/GetSaleBidsSuccessfulResponse'
+      security:
+      - ApiKey: []
+      tags:
+      - Bid
+  /marketplace/sales/:saleID/cancel:
+    delete:
+      operationId: cancelSale
+      parameters:
+      - description: saleID
+        in: path
+        name: saleID
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/CancelSaleSuccessfulResposnse'
+      security:
+      - ApiKey: []
+      tags:
+      - Sale
+  /marketplace/sales/:saleID/republish:
+    post:
+      operationId: republishSale
+      parameters:
+      - description: saleID
+        in: path
+        name: saleID
+        required: true
+        type: string
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/CancelSaleSuccessfulResposnse'
+      security:
+      - ApiKey: []
+      tags:
+      - Sale
+  /marketplace/sales/new:
+    post:
+      operationId: createSale
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/sale.CreateSaleSuccessfulResponse'
+      security:
+      - ApiKey: []
+      tags:
+      - Sale
+  /user/profile:
+    get:
+      operationId: profile
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/user.GetProfileSuccessfulResponse'
+      security:
+      - ApiKey: []
+      tags:
+      - User
 produces:
 - application/json
+securityDefinitions:
+  ApiKey:
+    in: header
+    name: x-auth-token
+    type: apiKey
 swagger: "2.0"
